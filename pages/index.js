@@ -9,6 +9,7 @@ export default function Home() {
   const [connectedAccount, setConnectedAccount] = useState(undefined);
   const [keyboards, setKeyboards] = useState([]);
   const [newKeyboard, setNewKeyboard] = useState("") // this is new!
+  const [keyboardsLoading, setKeyboardsLoading] = useState(false);
 
   // OLD ADDRESS:'0xb0a219Fb41e6135B59ceA24Fe27E8B94c44b898C';
   const contractAddress = '0x7F74C6e654C750f6F13e603Bc546E6FD86d27696';
@@ -47,35 +48,20 @@ export default function Home() {
 
   const getKeyboards = async () => {
     if (ethereum && connectedAccount) {
-      const provider = new ethers.providers.Web3Provider(ethereum);
-      const signer = provider.getSigner();
-      const keyboardsContract = new ethers.Contract(contractAddress, contractABI, signer);
+      setKeyboardsLoading(true); // loading...
 
-      const keyboards = await keyboardsContract.getKeyboards();
-      console.log('Retrieved keyboards...', keyboards)
-      setKeyboards(keyboards)
+      try { 
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const keyboardsContract = new ethers.Contract(contractAddress, contractABI, signer);
+  
+        const keyboards = await keyboardsContract.getKeyboards();
+        console.log('Retrieved keyboards...', keyboards);
+        setKeyboards(keyboards);
+      } finally {
+        setKeyboardsLoading(false); // loading...
+      }
     }
-  }
-
-  const submitCreate = async (e) => {
-    e.preventDefault();
-
-    if (!ethereum) {
-      console.error('Ethereum object is required to create a keyboard');
-      return;
-    }
-
-    const provider = new ethers.providers.Web3Provider(ethereum);
-    const signer = provider.getSigner();
-    const keyboardsContract = new ethers.Contract(contractAddress, contractABI, signer);
-
-    const createTxn = await keyboardsContract.create(newKeyboard);
-    console.log('Create transaction started...', createTxn.hash);
-
-    await createTxn.wait();
-    console.log('Created keyboard!', createTxn.hash);
-
-    await getKeyboards();
   }
 
   useEffect(() => {
@@ -102,6 +88,16 @@ export default function Home() {
             )
           )}
         </div>
+      </div>
+    )
+  }
+
+  // for loading...
+  if (keyboardsLoading) {
+    return (
+      <div className="flex flex-col gap-4">
+        <PrimaryButton type="link" href="/create">Create a Keyboard!</PrimaryButton>
+        <p>Loading Keyboards...</p>
       </div>
     )
   }
