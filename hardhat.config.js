@@ -27,4 +27,4 @@ module.exports = {
   }
 };
 
-// Live Address: 0xb0a219Fb41e6135B59ceA24Fe27E8B94c44b898C
+// Live Contract Address: 0xb0a219Fb41e6135B59ceA24Fe27E8B94c44b898C
