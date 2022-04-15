@@ -9,8 +9,11 @@ async function main() {
   // let keyboards = await keyboardsContract.getKeyboards();
   // console.log("We got the keyboards!", keyboards);
 
-  // const keyboardTxn1 = await keyboardsContract.create("A really great keyboard!");
+  // const keyboardTxn1 = await keyboardsContract.create(0, true, "sepia");
   // await keyboardTxn1.wait();
+
+  // const keyboardTxn2 = await keyboardsContract.create(1, false, "grayscale");
+  // await keyboardTxn2.wait();
 
   // const keyboardTxn2 = await keyboardsContract.connect(somebodyElse).create("An even better keyboard!");
   // await keyboardTxn2.wait();

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import PrimaryButton from "../components/primary-button";
 import abi from "../utils/Keyboards.json";
+import Keyboard from "../components/keyboard";
 
 export default function Home() {
   const [ethereum, setEthereum] = useState(undefined);
@@ -9,7 +10,8 @@ export default function Home() {
   const [keyboards, setKeyboards] = useState([]);
   const [newKeyboard, setNewKeyboard] = useState("") // this is new!
 
-  const contractAddress = '0xb0a219Fb41e6135B59ceA24Fe27E8B94c44b898C';
+  // OLD ADDRESS:'0xb0a219Fb41e6135B59ceA24Fe27E8B94c44b898C';
+  const contractAddress = '0x7F74C6e654C750f6F13e603Bc546E6FD86d27696';
   const contractABI = abi.abi;
 
   const handleAccounts = (accounts) => {
@@ -89,27 +91,27 @@ export default function Home() {
     return <PrimaryButton onClick={connectAccount}>Connect MetaMask Wallet</PrimaryButton>
   }
 
-  return (
-    <div className="flex flex-col gap-y-8">
-      <p>Connected Account: {connectedAccount}</p>
-      <form className="flex flex-col gap-y-2">
-        <div>
-          <label htmlFor="keyboard-description" className="block text-sm font-medium text-gray-700">
-            Keyboard Description
-          </label>
+  if (keyboards.length > 0) {
+    return (
+      <div className="flex flex-col gap-4">
+        <PrimaryButton type="link" href="/create">Create a Keyboard!</PrimaryButton>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-2">
+          {keyboards.map(
+            ([kind, isPBT, filter], i) => (
+              <Keyboard key={i} kind={kind} isPBT={isPBT} filter={filter} />
+            )
+          )}
         </div>
-        <input
-          name="keyboard-type"
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-          value={newKeyboard}
-          onChange={(e) => { setNewKeyboard(e.target.value) }}
-        />
-        <PrimaryButton type="submit" onClick={submitCreate}>
-          Create Keyboard!
-        </PrimaryButton>
-      </form>
-      <div>{keyboards.map((keyboard, i) => <p key={i}>{keyboard}</p>)}</div>
+      </div>
+    )
+  }
+
+  // No keyboards yet
+  return (
+    <div className="flex flex-col gap-4">
+      <PrimaryButton type="link" href="/create">Create a Keyboard!</PrimaryButton>
+      <p>No keyboards yet!</p>
     </div>
-  )  
+  )
   // return <p>Connected Account: {connectedAccount}</p>
 }
