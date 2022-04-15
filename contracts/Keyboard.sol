@@ -17,6 +17,8 @@ contract Keyboards {
     bool isPBT;
     // tailwind filters to layer over
     string filter;
+    // user who created it! 
+    address owner;
   }
 
   function getKeyboards() view public returns(Keyboard[] memory) {
@@ -27,10 +29,16 @@ contract Keyboards {
     Keyboard memory newKeyboard = Keyboard({
       kind: _kind,
       isPBT: _isPBT,
-      filter: _filter
+      filter: _filter,
+      owner: msg.sender
     });
 
     createdKeyboards.push(newKeyboard);
+  }
+  
+  function tip(uint256 _index) external payable  {
+    address payable owner = payable(createdKeyboards[_index].owner);
+    owner.transfer(msg.value);
   }
 
 }
