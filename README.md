@@ -1,15 +1,31 @@
-# Basic Sample Hardhat Project
+# Mechanical-Keyboard
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+> A web app that will allow you to create an on-chain mechanical keyboard, view other users' keyboards, and send an ETH tip to your favorites!
 
-Try running some of the following tasks:
+| Screenshot |
+| :--------: |
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
-```
+![](./public/screenshot/mechanical-keyboard.png)
+
+### **Welcome!**
+
+To get started with this project, clone this repo and follow these commands:
+
+- Run the frontend
+
+  1. Run `npm install` at the root of your directory
+  2. Run `npm run dev` to start the project
+  3. Start coding!
+
+- Run the smart contract
+  npx hardhat run scripts/run.js
+
+👤 **Muhammad Sesay**
+
+- GitHub: [@mmsesay](https://github.com/mmsesay)
+- Twitter: [@DeeMaejor](https://twitter.com/DeeMaejor)
+- LinkedIn: [LinkedIn](https://linkedin.com/in/muhammad-m-sesay)
+
+### Acknowledgments
+
+- [pointer.gg](https://www.pointer.gg/) for providing this awesome tutorial on how to get started with building a Web3 App with solidity + Ethereum Smart Contracts
