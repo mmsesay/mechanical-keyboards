@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import PrimaryButton from "../components/primary-button";
+import TipButton from "../components/tip-button";
 import abi from "../utils/Keyboards.json";
 import addressesEqual from "../utils/addressesEqual";
 import Keyboard from "../components/keyboard";
@@ -92,14 +93,14 @@ export default function Home() {
           Create a Keyboard!
         </PrimaryButton>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-2">
-          {keyboards.map(([kind, isPBT, filter], i) => (
+          {keyboards.map(([kind, isPBT, filter, owner], i) => (
             <div key={i} className="relative">
               <Keyboard key={i} kind={kind} isPBT={isPBT} filter={filter} />
               <span className="absolute top-1 right-6">
                 {addressesEqual(owner, connectedAccount) ? (
                   <UserCircleIcon className="h-5 w-5 text-indigo-100" />
                 ) : (
-                  <button>Tip!</button>
+                  <TipButton ethereum={ethereum} index={i} />
                 )}
               </span>
             </div>
@@ -130,5 +131,4 @@ export default function Home() {
       <p>No keyboards yet!</p>
     </div>
   );
-  // return <p>Connected Account: {connectedAccount}</p>
 }

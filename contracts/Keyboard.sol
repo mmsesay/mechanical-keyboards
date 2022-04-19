@@ -36,7 +36,7 @@ contract Keyboards {
     createdKeyboards.push(newKeyboard);
   }
   
-  function tip(uint256 _index) external payable  {
+  function tip(uint256 _index) external payable {
     address payable owner = payable(createdKeyboards[_index].owner);
     owner.transfer(msg.value);
   }
