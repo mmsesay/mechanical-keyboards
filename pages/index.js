@@ -1,68 +1,27 @@
 import { useState, useEffect } from "react";
-import { ethers } from "ethers";
+import { toast } from "react-hot-toast";
 import PrimaryButton from "../components/primary-button";
 import TipButton from "../components/tip-button";
-import abi from "../utils/Keyboards.json";
 import addressesEqual from "../utils/addressesEqual";
 import Keyboard from "../components/keyboard";
 import { UserCircleIcon } from "@heroicons/react/solid";
+import getKeyboardsContract from "../utils/getKeyboardsContract";
+import { useMetaMaskAccount } from "../components/meta-mask-account-provider";
 
 export default function Home() {
-  const [ethereum, setEthereum] = useState(undefined);
-  const [connectedAccount, setConnectedAccount] = useState(undefined);
   const [keyboards, setKeyboards] = useState([]);
-  const [newKeyboard, setNewKeyboard] = useState(""); // this is new!
-  const [keyboardsLoading, setKeyboardsLoading] = useState(false);
-
-  const contractAddress = "0xAd7b13eaEafBb459d0CF9826c409092610a0607C";
-  const contractABI = abi.abi;
-
-  const handleAccounts = (accounts) => {
-    if (accounts.length > 0) {
-      const account = accounts[0];
-      console.log("We have an authorized account: ", account);
-      setConnectedAccount(account);
-    } else {
-      console.log("No authorized accounts yet");
-    }
-  };
-
-  const getConnectedAccount = async () => {
-    if (window.ethereum) {
-      setEthereum(window.ethereum);
-    }
-
-    if (ethereum) {
-      const accounts = await ethereum.request({ method: "eth_accounts" });
-      handleAccounts(accounts);
-    }
-  };
-
-  const connectAccount = async () => {
-    if (!ethereum) {
-      alert("MetaMask is required to connect an account");
-      return;
-    }
-
-    const accounts = await ethereum.request({ method: "eth_requestAccounts" });
-    handleAccounts(accounts);
-  };
+  const [keyboardsLoading, setKeyboardsLoading] = useState(false);  
+  const { ethereum, connectedAccount, connectAccount } = useMetaMaskAccount();
+  const keyboardsContract = getKeyboardsContract(ethereum);
 
   const getKeyboards = async () => {
     if (ethereum && connectedAccount) {
       setKeyboardsLoading(true); // loading...
 
       try {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const keyboardsContract = new ethers.Contract(
-          contractAddress,
-          contractABI,
-          signer
-        );
-
         const keyboards = await keyboardsContract.getKeyboards();
         console.log("Retrieved keyboards...", keyboards);
+
         setKeyboards(keyboards);
       } finally {
         setKeyboardsLoading(false); // loading...
@@ -70,9 +29,32 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    getConnectedAccount(), getKeyboards();
-  }, [connectedAccount]);
+  const addContractEventHandlers = () => {
+    if (keyboardsContract && connectedAccount) {
+      keyboardsContract.on("KeyboardCreated", async (keyboard) => {
+        if (
+          connectedAccount &&
+          !addressesEqual(keyboard.owner, connectedAccount)
+        ) {
+          toast("Somebody created a new keyboard!", {
+            id: JSON.stringify(keyboard),
+          });
+        }
+        await getKeyboards();
+      });
+
+      keyboardsContract.on("TipSent", (recipient, amount) => {
+        if (addressesEqual(recipient, connectedAccount)) {
+          toast(
+            `You received a tip of ${ethers.utils.formatEther(amount)} eth!`,
+            { id: recipient + amount }
+          );
+        }
+      });
+    }
+  };
+
+  useEffect(addContractEventHandlers, [!!keyboardsContract, connectedAccount]);
 
   if (!ethereum) {
     return <p>Please install MetaMask to connect to this site</p>;
@@ -100,7 +82,7 @@ export default function Home() {
                 {addressesEqual(owner, connectedAccount) ? (
                   <UserCircleIcon className="h-5 w-5 text-indigo-100" />
                 ) : (
-                  <TipButton ethereum={ethereum} index={i} />
+                  <TipButton keyboardsContract={keyboardsContract} index={i} />
                 )}
               </span>
             </div>
